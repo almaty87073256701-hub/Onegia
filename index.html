@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>O`negia — подбор кулона и камней по знаку зодиака</title>
+  <meta name="description" content="O`negia — поможем выбрать кулон и камни, которые подходят вам по знаку зодиака." />
+
+  <style>
+    :root{
+      --bg:#0b0b12;
+      --card:#121225;
+      --card2:#15152b;
+      --text:#f3f4ff;
+      --muted:#b7b9d6;
+      --accent:#d6b6ff;
+      --accent2:#7ce7ff;
+      --danger:#ff6b6b;
+      --ok:#7dffb2;
+
+      --radius:18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --max: 1050px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(214,182,255,.35), transparent 55%),
+        radial-gradient(1000px 700px at 90% 10%, rgba(124,231,255,.25), transparent 50%),
+        radial-gradient(900px 700px at 50% 120%, rgba(255,160,240,.12), transparent 55%),
+        var(--bg);
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width:var(--max); margin:0 auto; padding:22px 16px 60px; }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px 16px;
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(18,18,37,.85), rgba(18,18,37,.55));
+      box-shadow: var(--shadow);
+      position:sticky;
+      top:10px;
+      backdrop-filter: blur(10px);
+      z-index:20;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 0;
+    }
+
+    .logo{
+      width:42px; height:42px;
+      border-radius:14px;
+      background: linear-gradient(135deg, rgba(214,182,255,.95), rgba(124,231,255,.9));
+      box-shadow: 0 10px 25px rgba(214,182,255,.12);
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+      overflow:hidden;
+    }
+
+    .logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .brand h1{
+      font-size:18px;
+      margin:0;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .brand small{
+      display:block;
+      color:var(--muted);
+      font-size:12px;
+      margin-top:2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .pill{
+      font-size:12px;
+      color: rgba(243,244,255,.92);
+      padding:9px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+
+    main{ margin-top:18px; }
+
+    .hero{
+      padding:22px 18px;
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(21,21,43,.85), rgba(21,21,43,.55));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(700px 260px at 10% 0%, rgba(214,182,255,.22), transparent 60%),
+        radial-gradient(700px 260px at 90% 0%, rgba(124,231,255,.18), transparent 60%);
+      pointer-events:none;
+    }
+
+    .hero > *{ position:relative; }
+    .hero h2{ margin:0 0 10px; font-size:22px; }
+    .hero p{ margin:0; color:var(--muted); line-height:1.55; max-width: 70ch; }
+
+    .section-title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+      margin:18px 2px 10px;
+    }
+    .section-title h3{
+      margin:0;
+      font-size:16px;
+      color: rgba(243,244,255,.95);
+      letter-spacing:.2px;
+    }
+    .hint{
+      margin:0;
+      font-size:12px;
+      color: var(--muted);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:10px;
+      margin-top:12px;
+    }
+    @media (min-width: 520px){
+      .grid{ grid-template-columns: repeat(3, 1fr); gap:12px; }
+    }
+    @media (min-width: 860px){
+      .grid{ grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .zodiac-btn{
+      background: linear-gradient(180deg, rgba(18,18,37,.9), rgba(18,18,37,.55));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 14px 12px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+      cursor:pointer;
+      text-align:left;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      user-select:none;
+      min-height: 86px;
+    }
+    .zodiac-btn:hover{
+      transform: translateY(-2px);
+      border-color: rgba(214,182,255,.35);
+      background: linear-gradient(180deg, rgba(21,21,43,.95), rgba(18,18,37,.55));
+    }
+    .zodiac-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .glyph{
+      width:42px;
+      height:42px;
+      border-radius: 16px;
+      display:grid;
+      place-items:center;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
+      font-size:22px;
+    }
+    .zodiac-name{
+      margin:10px 0 0;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .zodiac-dates{
+      margin:2px 0 0;
+      font-size:12px;
+      color: var(--muted);
+    }
+
+    /* Detail page */
+    .detail{
+      display:none;
+      margin-top:14px;
+      padding:18px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(21,21,43,.88), rgba(21,21,43,.55));
+      box-shadow: var(--shadow);
+    }
+    .detail.active{ display:block; }
+
+    .detail-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .detail-head h2{
+      margin:0;
+      font-size:20px;
+    }
+    .back{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .back:hover{
+      transform: translateY(-1px);
+      border-color: rgba(124,231,255,.35);
+    }
+
+    .cols{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    @media (min-width: 900px){
+      .cols{ grid-template-columns: 1.2fr .8fr; align-items:start; }
+    }
+
+    .card{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(18,18,37,.60);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .card h4{ margin:0 0 8px; font-size:14px; }
+    .card p{ margin:0; color: var(--muted); line-height:1.55; font-size:13px; }
+
+    .tags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+    }
+    .tag{
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:999px;
+      background: rgba(214,182,255,.10);
+      border: 1px solid rgba(214,182,255,.18);
+      color: rgba(243,244,255,.92);
+    }
+
+    .gallery{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:10px;
+      margin-top:12px;
+    }
+    @media (min-width: 620px){
+      .gallery{ grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .ph{
+      border-radius: 16px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      aspect-ratio: 1 / 1;
+      position:relative;
+    }
+    .ph img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .ph span{
+      position:absolute;
+      left:10px; bottom:10px;
+      font-size:12px;
+      color: rgba(243,244,255,.9);
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.12);
+      padding:6px 8px;
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* Form */
+    form{ display:grid; gap:10px; margin-top:10px; }
+    .row{ display:grid; grid-template-columns: 1fr; gap:10px; }
+    @media (min-width: 520px){ .row{ grid-template-columns: 1fr 1fr; } }
+
+    label{ font-size:12px; color: var(--muted); display:block; margin:0 0 6px; }
+    input, textarea{
+      width:100%;
+      padding:12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(11,11,18,.55);
+      color: var(--text);
+      outline:none;
+    }
+    input:focus, textarea:focus{
+      border-color: rgba(214,182,255,.40);
+      box-shadow: 0 0 0 3px rgba(214,182,255,.10);
+    }
+    textarea{ min-height: 96px; resize: vertical; }
+
+    .req{ color: rgba(255,255,255,.92); }
+    .req b{ color: var(--accent2); }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:4px;
+    }
+    .btn{
+      padding:12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease;
+      flex: 1 1 180px;
+      text-align:center;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(214,182,255,.35); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(214,182,255,.28), rgba(124,231,255,.18));
+      border-color: rgba(214,182,255,.28);
+    }
+
+    .error{
+      display:none;
+      padding:10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,107,107,.35);
+      background: rgba(255,107,107,.10);
+      color: rgba(255,230,230,.95);
+      font-size:12px;
+      line-height:1.4;
+    }
+    .error.show{ display:block; }
+
+    footer{
+      margin-top:18px;
+      color: var(--muted);
+      font-size:12px;
+      text-align:center;
+      opacity:.95;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-label="O`negia logo">
+          <img src="logo.png" alt="O`negia">
+        </div>
+
+        <div>
+          <h1>O`negia</h1>
+          <small>Кулоны таро • камни • энергетическая поддержка</small>
+        </div>
+      </div>
+      <div class="pill">Мы поможем выбрать то, что вам подходит</div>
+    </header>
+
+    <main>
+      <!-- Главная -->
+      <section id="home">
+        <div class="hero">
+          <h2>Выберите свой знак зодиака</h2>
+          <p>
+            Если сложно определиться в Instagram — здесь вы быстро найдете сочетания кулона и камней,
+            которые подходят вашему знаку. Затем вы отправите готовый запрос в WhatsApp или Telegram.
+          </p>
+
+          <div class="section-title">
+            <h3>Знаки зодиака</h3>
+            <p class="hint">Нажмите на иконку, чтобы открыть подбор</p>
+          </div>
+
+          <div class="grid" id="zodiacGrid" aria-label="zodiac grid"></div>
+        </div>
+
+        <footer>© <span id="year"></span> O`negia</footer>
+      </section>
+
+      <!-- Детальная страница -->
+      <section id="detail" class="detail" aria-live="polite">
+        <div class="detail-head">
+          <div>
+            <h2 id="detailTitle">Знак</h2>
+            <p class="hint" id="detailSubtitle">Подбор кулона и камней</p>
+          </div>
+          <button class="back" id="backBtn" type="button">← Назад</button>
+        </div>
+
+        <div class="cols">
+          <div class="card">
+            <h4>Рекомендации</h4>
+            <p id="detailText"></p>
+            <div class="tags" id="detailTags"></div>
+
+            <h4 style="margin-top:14px;">Портфолио изделий</h4>
+            <p class="hint">Сейчас стоит по 2 фото на каждый знак (с повторениями). Потом можно легко заменить на свои.</p>
+            <div class="gallery" id="gallery"></div>
+          </div>
+
+          <div class="card">
+            <h4>Заявка в WhatsApp / Telegram</h4>
+            <p class="req">Поля <b>*</b> обязательны: <b>Имя</b> и <b>Телефон</b>.</p>
+
+            <div id="formError" class="error" role="alert"></div>
+
+            <form id="leadForm">
+              <div class="row">
+                <div>
+                  <label for="name">Имя <b>*</b></label>
+                  <input id="name" name="name" placeholder="Например: Алина" autocomplete="name" required />
+                </div>
+                <div>
+                  <label for="phone">Номер телефона <b>*</b></label>
+                  <input id="phone" name="phone" placeholder="+7 7XX XXX XX XX" autocomplete="tel" required />
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <label for="birth">Дата рождения</label>
+                  <input id="birth" name="birth" type="date" />
+                </div>
+                <div>
+                  <label for="intent">Намерение (ситуация/запрос)</label>
+                  <input id="intent" name="intent" placeholder="Например: поддержка в период перемен" />
+                </div>
+              </div>
+
+              <div>
+                <label for="note">Комментарий</label>
+                <textarea id="note" name="note" placeholder="Можно описать, что сейчас чувствуете или что хотите усилить."></textarea>
+              </div>
+
+              <div class="actions">
+                <button class="btn primary" type="button" id="sendWA">Отправить в WhatsApp</button>
+                <button class="btn" type="button" id="sendTG">Отправить в Telegram</button>
+              </div>
+
+              <p class="hint" style="margin:4px 0 0;">
+                Нажимая “Отправить”, вы сформируете сообщение с выбранным знаком и данными формы.
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ==========================
+    // НАСТРОЙКИ КОНТАКТОВ
+    // ==========================
+    // WhatsApp: номер в международном формате БЕЗ + и пробелов. Пример: 77001234567
+    const WHATSAPP_NUMBER = "77761630783";
+
+    // Telegram username тут не используется, т.к. отправка через share-ссылку
+    // (Оставляю переменную на будущее, если захотите открывать именно ваш чат)
+    const TELEGRAM_USERNAME = "onegiajewelry";
+
+    // ==========================
+    // ДАННЫЕ ПО ЗНАКАМ
+    // ==========================
+    const ZODIAC = [
+      {
+        key: "aries",
+        name: "Овен",
+        dates: "21.03 – 19.04",
+        glyph: "♈",
+        pendants: ["Кулон «Сила»", "Кулон «Импульс»"],
+        stones: ["Гранат", "Карнеол", "Рубин (по запросу)"],
+        text: "Овну подходит энергия действия, смелости и обновления. Рекомендуем сочетания, которые поддерживают уверенность, помогают держать фокус и мягко направляют силу в созидание."
+      },
+      {
+        key: "taurus",
+        name: "Телец",
+        dates: "20.04 – 20.05",
+        glyph: "♉",
+        pendants: ["Кулон «Заземление»", "Кулон «Ресурс»"],
+        stones: ["Розовый кварц", "Нефрит", "Авантюрин"],
+        text: "Тельцу важны устойчивость и комфорт. Камни для гармонизации эмоций, усиления ресурса и спокойного притяжения желаемого — без перегруза."
+      },
+      {
+        key: "gemini",
+        name: "Близнецы",
+        dates: "21.05 – 20.06",
+        glyph: "♊",
+        pendants: ["Кулон «Лёгкость»", "Кулон «Ясность»"],
+        stones: ["Цитрин", "Агат", "Лабрадорит"],
+        text: "Близнецам подходит баланс ума и чувств. Рекомендуем камни для ясности мыслей, коммуникации и защиты от информационного шума."
+      },
+      {
+        key: "cancer",
+        name: "Рак",
+        dates: "21.06 – 22.07",
+        glyph: "♋",
+        pendants: ["Кулон «Защита»", "Кулон «Сердце»"],
+        stones: ["Лунный камень", "Жемчуг (по запросу)", "Родонит"],
+        text: "Раку важны безопасность и поддержка. Сочетания для мягкой защиты, эмоционального исцеления и чувства ‘я в своём пространстве’."
+      },
+      {
+        key: "leo",
+        name: "Лев",
+        dates: "23.07 – 22.08",
+        glyph: "♌",
+        pendants: ["Кулон «Солнце»", "Кулон «Харизма»"],
+        stones: ["Солнечный камень", "Тигровый глаз", "Цитрин"],
+        text: "Льву подходит сияние и уверенность. Камни для самовыражения, поддержки лидерства и тёплой, заметной энергии."
+      },
+      {
+        key: "virgo",
+        name: "Дева",
+        dates: "23.08 – 22.09",
+        glyph: "♍",
+        pendants: ["Кулон «Порядок»", "Кулон «Спокойствие»"],
+        stones: ["Аметист", "Флюорит", "Агат"],
+        text: "Деве важны чистота и ясность. Рекомендуем камни для снижения тревожности, концентрации и бережной поддержки нервной системы."
+      },
+      {
+        key: "libra",
+        name: "Весы",
+        dates: "23.09 – 22.10",
+        glyph: "♎",
+        pendants: ["Кулон «Баланс»", "Кулон «Любовь»"],
+        stones: ["Розовый кварц", "Лазурит", "Турмалин (по запросу)"],
+        text: "Весам подходит гармония и красота. Сочетания, которые помогают принимать решения, сохранять баланс и поддерживать самоценность."
+      },
+      {
+        key: "scorpio",
+        name: "Скорпион",
+        dates: "23.10 – 21.11",
+        glyph: "♏",
+        pendants: ["Кулон «Трансформация»", "Кулон «Глубина»"],
+        stones: ["Обсидиан", "Гранат", "Лабрадорит"],
+        text: "Скорпиону важны защита и трансформация. Камни для глубины, внутренней силы и аккуратного ‘снятия’ лишнего эмоционального напряжения."
+      },
+      {
+        key: "sagittarius",
+        name: "Стрелец",
+        dates: "22.11 – 21.12",
+        glyph: "♐",
+        pendants: ["Кулон «Путь»", "Кулон «Вдохновение»"],
+        stones: ["Бирюза", "Содалит", "Цитрин"],
+        text: "Стрельцу подходит расширение и вдохновение. Рекомендуем сочетания для энергии пути, уверенности и веры в свои планы."
+      },
+      {
+        key: "capricorn",
+        name: "Козерог",
+        dates: "22.12 – 19.01",
+        glyph: "♑",
+        pendants: ["Кулон «Опора»", "Кулон «Достижение»"],
+        stones: ["Оникс", "Дымчатый кварц", "Гематит"],
+        text: "Козерогу важны опора и дисциплина. Камни для заземления, устойчивости и спокойной силы без эмоционального выгорания."
+      },
+      {
+        key: "aquarius",
+        name: "Водолей",
+        dates: "20.01 – 18.02",
+        glyph: "♒",
+        pendants: ["Кулон «Свобода»", "Кулон «Интуиция»"],
+        stones: ["Аметист", "Лабрадорит", "Аквамарин (по запросу)"],
+        text: "Водолею подходит свежий взгляд и интуиция. Сочетания для вдохновения, внутренней свободы и ‘чистого’ ощущения себя."
+      },
+      {
+        key: "pisces",
+        name: "Рыбы",
+        dates: "19.02 – 20.03",
+        glyph: "♓",
+        pendants: ["Кулон «Мечта»", "Кулон «Поток»"],
+        stones: ["Аквамарин", "Аметист", "Лунный камень"],
+        text: "Рыбам важны мягкость и поддержка чувств. Камни для спокойствия, защиты от перегруза и возвращения в ресурс."
+      }
+    ];
+
+    // ==========================
+    // ГАЛЕРЕИ ФОТО (по 2 на знак)
+    // ВАЖНО:
+    // - папка img должна лежать рядом с index.html
+    // - имена файлов как у вас: aries1.jpg, aries2.jpg, taurus1.jpg, taurus2.jpg
+    // Сейчас фото повторяются между знаками — это нормально, пока фото мало.
+    // Потом вы просто поменяете src на свои картинки для каждого знака.
+    // ==========================
+    const GALLERIES = {
+      "Овен": [
+        { src: "img/aries1.jpg", label: "Изделие #1" },
+        { src: "img/aries2.jpg", label: "Изделие #2" }
+      ],
+      "Телец": [
+        { src: "img/taurus1.jpg", label: "Изделие #1" },
+        { src: "img/taurus2.jpg", label: "Изделие #2" }
+      ],
+      "Близнецы": [
+        { src: "img/aries1.jpg", label: "Изделие #1" },
+        { src: "img/taurus1.jpg", label: "Изделие #2" }
+      ],
+      "Рак": [
+        { src: "img/aries2.jpg", label: "Изделие #1" },
+        { src: "img/taurus2.jpg", label: "Изделие #2" }
+      ],
+      "Лев": [
+        { src: "img/taurus1.jpg", label: "Изделие #1" },
+        { src: "img/aries1.jpg", label: "Изделие #2" }
+      ],
+      "Дева": [
+        { src: "img/taurus2.jpg", label: "Изделие #1" },
+        { src: "img/aries2.jpg", label: "Изделие #2" }
+      ],
+      "Весы": [
+        { src: "img/aries1.jpg", label: "Изделие #1" },
+        { src: "img/taurus2.jpg", label: "Изделие #2" }
+      ],
+      "Скорпион": [
+        { src: "img/aries2.jpg", label: "Изделие #1" },
+        { src: "img/taurus1.jpg", label: "Изделие #2" }
+      ],
+      "Стрелец": [
+        { src: "img/taurus1.jpg", label: "Изделие #1" },
+        { src: "img/taurus2.jpg", label: "Изделие #2" }
+      ],
+      "Козерог": [
+        { src: "img/aries1.jpg", label: "Изделие #1" },
+        { src: "img/aries2.jpg", label: "Изделие #2" }
+      ],
+      "Водолей": [
+        { src: "img/taurus2.jpg", label: "Изделие #1" },
+        { src: "img/aries1.jpg", label: "Изделие #2" }
+      ],
+      "Рыбы": [
+        { src: "img/taurus1.jpg", label: "Изделие #1" },
+        { src: "img/aries2.jpg", label: "Изделие #2" }
+      ]
+    };
+
+    function imagesFor(signName){
+      return GALLERIES[signName] || [];
+    }
+
+    // ==========================
+    // РЕНДЕР ГЛАВНОЙ
+    // ==========================
+    const zodiacGrid = document.getElementById("zodiacGrid");
+    const home = document.getElementById("home");
+    const detail = document.getElementById("detail");
+
+    const detailTitle = document.getElementById("detailTitle");
+    const detailSubtitle = document.getElementById("detailSubtitle");
+    const detailText = document.getElementById("detailText");
+    const detailTags = document.getElementById("detailTags");
+    const gallery = document.getElementById("gallery");
+    const backBtn = document.getElementById("backBtn");
+
+    const form = document.getElementById("leadForm");
+    const formError = document.getElementById("formError");
+    const sendWA = document.getElementById("sendWA");
+    const sendTG = document.getElementById("sendTG");
+
+    let currentSign = null;
+
+    function renderHome(){
+      zodiacGrid.innerHTML = "";
+      ZODIAC.forEach((z) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "zodiac-btn";
+        btn.setAttribute("aria-label", z.name);
+
+        btn.innerHTML = `
+          <div class="zodiac-top">
+            <div>
+              <div class="glyph">${z.glyph}</div>
+            </div>
+            <div style="flex:1; min-width:0; text-align:right; color: rgba(214,182,255,.9); font-size:12px;">
+              открыть →
+            </div>
+          </div>
+          <div class="zodiac-name">${z.name}</div>
+          <div class="zodiac-dates">${z.dates}</div>
+        `;
+
+        btn.addEventListener("click", () => openSign(z.key));
+        zodiacGrid.appendChild(btn);
+      });
+    }
+
+    function openSign(key){
+      const z = ZODIAC.find(x => x.key === key);
+      if(!z) return;
+      currentSign = z;
+
+      // Title
+      detailTitle.textContent = `${z.glyph} ${z.name}`;
+      detailSubtitle.textContent = `Подбор кулона и камней для знака ${z.name}`;
+
+      // Text
+      detailText.textContent = z.text;
+
+      // Tags (кулоны и камни)
+      detailTags.innerHTML = "";
+      [...z.pendants.map(p => `Кулон: ${p}`), ...z.stones.map(s => `Камень: ${s}`)]
+        .forEach(t => {
+          const el = document.createElement("span");
+          el.className = "tag";
+          el.textContent = t;
+          detailTags.appendChild(el);
+        });
+
+      // Gallery
+      gallery.innerHTML = "";
+      const imgs = imagesFor(z.name);
+
+      if(!imgs.length){
+        const p = document.createElement("p");
+        p.className = "hint";
+        p.textContent = "Фото для этого знака скоро добавим ✨";
+        gallery.appendChild(p);
+      } else {
+        imgs.forEach((img) => {
+          const ph = document.createElement("div");
+          ph.className = "ph";
+          ph.innerHTML = `<img src="${img.src}" alt="${img.label} для ${z.name}" loading="lazy"><span>${img.label}</span>`;
+          gallery.appendChild(ph);
+        });
+      }
+
+      // Show detail
+      home.style.display = "none";
+      detail.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goBack(){
+      currentSign = null;
+      form.reset();
+      hideError();
+      detail.classList.remove("active");
+      home.style.display = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    backBtn.addEventListener("click", goBack);
+
+    // ==========================
+    // ФОРМА + ВАЛИДАЦИЯ + ОТПРАВКА
+    // ==========================
+    function showError(msg){
+      formError.textContent = msg;
+      formError.classList.add("show");
+    }
+    function hideError(){
+      formError.textContent = "";
+      formError.classList.remove("show");
+    }
+
+    function getFormData(){
+      const fd = new FormData(form);
+      return {
+        name: (fd.get("name") || "").toString().trim(),
+        phone: (fd.get("phone") || "").toString().trim(),
+        birth: (fd.get("birth") || "").toString().trim(),
+        intent: (fd.get("intent") || "").toString().trim(),
+        note: (fd.get("note") || "").toString().trim()
+      };
+    }
+
+    function validate(){
+      hideError();
+      const d = getFormData();
+      if(!d.name) return { ok:false, msg:"Пожалуйста, укажите Имя (обязательно)." };
+      if(!d.phone) return { ok:false, msg:"Пожалуйста, укажите Номер телефона (обязательно)." };
+      if(!currentSign) return { ok:false, msg:"Сначала выберите знак зодиака." };
+      return { ok:true, data:d };
+    }
+
+    function buildMessage(){
+      const v = validate();
+      if(!v.ok){
+        showError(v.msg);
+        return null;
+      }
+      const d = v.data;
+
+      const lines = [];
+      lines.push("Здравствуйте! Хочу подобрать кулон и камни ✨");
+      lines.push(`Знак: ${currentSign.name} (${currentSign.dates})`);
+      lines.push(`Имя: ${d.name}`);
+      lines.push(`Телефон: ${d.phone}`);
+      if(d.birth) lines.push(`Дата рождения: ${d.birth}`);
+      if(d.intent) lines.push(`Намерение: ${d.intent}`);
+      if(d.note) lines.push(`Комментарий: ${d.note}`);
+      lines.push("");
+      lines.push("Подбор с сайта O`negia.");
+
+      return lines.join("\n");
+    }
+
+    sendWA.addEventListener("click", () => {
+      const msg = buildMessage();
+      if(!msg) return;
+
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+    });
+
+    sendTG.addEventListener("click", () => {
+      const msg = buildMessage();
+      if(!msg) return;
+
+      // Отправка в Telegram через share (удобнее)
+      const url = `https://t.me/share/url?url=&text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+    });
+
+    // ==========================
+    // INIT
+    // ==========================
+    document.getElementById("year").textContent = new Date().getFullYear();
+    renderHome();
+  </script>
+</body>
+</html>
